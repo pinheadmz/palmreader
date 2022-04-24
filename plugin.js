@@ -7,7 +7,8 @@
 const blessed = require('blessed');
 const contrib = require('blessed-contrib');
 const State = require('./lib/state');
-const {Rules, Namestate} = require('hsd');
+const {hsd} = require('./lib/util');
+const {Rules, Namestate} = hsd;
 
 const Logger = require('./lib/widgets/logger');
 const NodeStatus = require('./lib/widgets/nodeStatus');
