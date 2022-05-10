@@ -122,7 +122,8 @@ class App {
       this.accountDetails,
       this.createWallet,
       this.backupWallet,
-      this.createTransaction
+      this.createTransaction,
+      this.importTransaction
     ];
 
     // Create and add modals directly to sreen
