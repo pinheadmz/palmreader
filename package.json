@@ -17,7 +17,8 @@
   },
   "homepage": "https://github.com/pinheadmz/palmreader#readme",
   "dependencies": {
-    "blessed": "^0.1.81",
-    "blessed-contrib": "^4.11.0"
+    "blessed": "github:pinheadmz/blessed",
+    "blessed-contrib": "^4.11.0",
+    "blgr": "^0.2.0"
   }
 }
