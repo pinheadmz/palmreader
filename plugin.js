@@ -186,6 +186,10 @@ class App {
       await new Promise(r => setTimeout(r, 500));
       return process.exit(0);
     });
+    this.screen.key(['escape'], () => {
+      this.modals.forEach(modal => modal.close());
+      this.screen.focused = this.screen;
+    });
 
     this.screen.render();
   }
