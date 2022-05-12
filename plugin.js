@@ -26,6 +26,7 @@ const Actions = require('./lib/widgets/actions');
 const SignTransaction = require('./lib/modals/signTransaction');
 const ExportTransaction = require('./lib/modals/exportTransaction');
 const UpdateRecords = require('./lib/modals/updateRecords');
+const RPC = require('./lib/modals/rpc');
 
 class App {
   constructor(node) {
@@ -143,12 +144,17 @@ class App {
     this.updateRecords = new UpdateRecords({
       app: this
     });
+    this.rpc = new RPC({
+      app: this,
+      focusKeys: ['r', 'R']
+    });
 
     // Store all modals for refresh loops
     this.modals = [
       this.signTransaction,
       this.exportTransaction,
-      this.updateRecords
+      this.updateRecords,
+      this.rpc
     ];
   }
 
