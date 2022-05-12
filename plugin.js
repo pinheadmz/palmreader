@@ -35,10 +35,7 @@ class App {
 
     this.state = new State();
 
-    this.screen = blessed.screen({
-      log: '/Users/matthewzipkin/blessed.log',
-      debug: true
-    });
+    this.screen = blessed.screen();
 
     // Covers up a bug in blessed where fragments of "hidden" objects
     // still appear between the cracks of other visible objects.
