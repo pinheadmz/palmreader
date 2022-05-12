@@ -228,7 +228,7 @@ class App {
     // Only do this stuff once
     if (!this.walletLoaded) {
       // Bind to wallet events
-      this.wdb.once('balance', async () => {
+      this.wdb.on('balance', async () => {
         try {
           await this.loadWallet();
           await this.refreshAll();
