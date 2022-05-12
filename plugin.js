@@ -15,6 +15,7 @@ const NodeStatus = require('./lib/widgets/nodeStatus');
 const WalletList = require('./lib/widgets/walletList');
 const AccountList = require('./lib/widgets/accountList');
 const AccountDetails = require('./lib/widgets/accountDetails');
+const CreateAccount = require('./lib/widgets/createAccount');
 const CreateWallet = require('./lib/widgets/createWallet');
 const BackupWallet = require('./lib/widgets/backupWallet');
 const CreateTransaction = require('./lib/widgets/createTransaction');
@@ -81,8 +82,13 @@ class App {
     });
     this.accountList = new AccountList({
       app: this,
-      coords: [2, 9, 2, 3],
+      coords: [2, 9, 2, 2],
       focusKeys: ['a', 'A']
+    });
+    this.createAccount = new CreateAccount({
+      app: this,
+      coords: [2, 11, 2, 1],
+      focusKeys: ['r', 'R']
     });
     this.accountDetails = new AccountDetails({
       app: this,
@@ -119,6 +125,7 @@ class App {
       this.nodeStatus,
       this.walletList,
       this.accountList,
+      this.createAccount,
       this.accountDetails,
       this.createWallet,
       this.backupWallet,
