@@ -11,6 +11,7 @@ const {hsd} = require('./lib/util');
 const {Rules, Namestate} = hsd;
 
 const Logger = require('./lib/widgets/logger');
+const History = require('./lib/widgets/history');
 const NodeStatus = require('./lib/widgets/nodeStatus');
 const WalletList = require('./lib/widgets/walletList');
 const AccountList = require('./lib/widgets/accountList');
@@ -60,7 +61,11 @@ class App {
     // coords = [row, col, rowSpan, colSpan]
     this.logger = new Logger({
       app: this,
-      coords: [0, 0, 6, 6]
+      coords: [0, 0, 3, 6]
+    });
+    this.history = new History({
+      app: this,
+      coords: [3, 0, 3, 6]
     });
     this.names = new Names({
       app: this,
@@ -89,7 +94,7 @@ class App {
     this.createAccount = new CreateAccount({
       app: this,
       coords: [2, 11, 2, 1],
-      focusKeys: ['r', 'R']
+      focusKeys: ['e', 'E']
     });
     this.accountDetails = new AccountDetails({
       app: this,
@@ -121,6 +126,7 @@ class App {
     this.refreshRate = 250;
     this.widgets = [
       this.logger,
+      this.history,
       this.names,
       this.actions,
       this.nodeStatus,
@@ -180,7 +186,7 @@ class App {
     });
 
     // Global keys
-    this.screen.key(['q', 'Q', 'C-c'], async (ch, key) => {
+    this.screen.key(['q', 'Q', 'C-c'], async () => {
       await this.node.close();
       // Watch node close in debug log...
       await new Promise(r => setTimeout(r, 500));
@@ -276,7 +282,51 @@ class App {
     this.walletdb.rpc.wallet = wallet;
 
     await this.getSelectedWalletNames();
+    await this.getSelectedWalletHistory();
     await this.selectName(null);
+  }
+
+  async getSelectedWalletHistory() {
+    const wallet = this.state.getWallet();
+    const txs = await wallet.getHistory(this.state.selectedAccount);
+    txs.sort((a, b) => {
+      return b.mtime - a.mtime;
+    });
+    const details = await wallet.toDetails(txs);
+    const jsons = [];
+    for (const item of details)
+      jsons.push(item.getJSON(this.wdb.network, this.wdb.height));
+
+    jsons.map((tx) => {
+      tx.balanceDelta = 0;
+      tx.actions = [];
+      for (const input of tx.inputs) {
+        if (input.path)
+          tx.balanceDelta -= input.value;
+      }
+      for (const output of tx.outputs) {
+        if (output.path)
+          tx.balanceDelta += output.value;
+
+        switch(output.covenant.type) {
+          case Rules.types.NONE:
+            break;
+          case Rules.types.OPEN:
+            tx.actions.push(
+              'OPEN: ' +
+              Buffer.from(output.covenant.items[2], 'hex').toString('ascii')
+            );
+            break;
+          default:
+            tx.actions.push(
+              Rules.typesByVal[output.covenant.type] +
+              ': ' +
+              this.state.namesByHash.get(output.covenant.items[0])
+            );
+        }
+      }
+    });
+    this.state.history = jsons;
   }
 
   async getSelectedWalletNames() {
