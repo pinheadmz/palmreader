@@ -254,6 +254,7 @@ class App {
       this.wdb.on('balance', async () => {
         try {
           await this.loadWallet();
+          await this.getSelectedWalletHistory();
           await this.refreshAll();
         } catch (e) {
           this.log(e.message);
