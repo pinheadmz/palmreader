@@ -280,15 +280,19 @@ class App {
     this.state.selectedAccount = 'default';
     // Equivalent to `hsw-rpc selectwallet ...`
     const wallet = this.state.getWallet();
+    if (!wallet)
+      return;
     this.walletdb.rpc.wallet = wallet;
 
-    await this.getSelectedWalletNames();
     await this.getSelectedWalletHistory();
+    await this.getSelectedWalletNames();
     await this.selectName(null);
   }
 
   async getSelectedWalletHistory() {
     const wallet = this.state.getWallet();
+    if (!wallet)
+      return;
     const txs = await wallet.getHistory(this.state.selectedAccount);
     txs.sort((a, b) => {
       return b.mtime - a.mtime;
@@ -332,6 +336,8 @@ class App {
 
   async getSelectedWalletNames() {
     const wallet = this.state.getWallet();
+    if (!wallet)
+      return;
     const names = await wallet.getNames();
 
     let {height, network} = this.node.chain;
@@ -443,6 +449,8 @@ class App {
       return;
 
     const wallet = this.state.getWallet();
+    if (!wallet)
+      return;
 
     // Get input coins to derive our known paths
     const view = await wallet.getCoinView(mtx);
