@@ -31,6 +31,9 @@ const RPC = require('./lib/modals/rpc');
 
 class App {
   constructor(node) {
+    this.refreshRate = 250;
+    this.historyLimit = 25;
+
     this.node = node;
     this.walletdb = null;
     this.wdb = null;
@@ -123,7 +126,6 @@ class App {
     });
 
     // Store all widgets in array for refresh loops
-    this.refreshRate = 250;
     this.widgets = [
       this.logger,
       this.history,
@@ -179,7 +181,15 @@ class App {
 
     // Bind to node events
     this.node.chain.on('connect', async () => {
+      // Slow down the walletDB calls while syncing or rescanning
+      if (   this.node.chain.getProgress() < 0.9
+          || this.wdb.rescanning) {
+        if (this.wdb.height % 1000 !== 0)
+          return;
+      }
+
       await this.loadWallet();
+      await this.getSelectedWalletHistory();
       await this.getSelectedWalletNames();
       await this.selectName(this.state.selectedName);
       this.refreshAll();
@@ -250,8 +260,18 @@ class App {
 
     // Only do this stuff once
     if (!this.walletLoaded) {
+      // Load primary/default
+      await this.selectWallet('primary');
+
       // Bind to wallet events
       this.wdb.on('balance', async () => {
+        // Slow down the walletDB calls while syncing or rescanning
+        if (   this.node.chain.getProgress() < 0.9
+            || this.wdb.rescanning) {
+          if (this.wdb.height % 1000 !== 0)
+            return;
+        }
+
         try {
           await this.loadWallet();
           await this.getSelectedWalletHistory();
@@ -263,9 +283,6 @@ class App {
 
       // Bind events on all wallet widgets
       this.widgets.forEach(widget => widget.initWallet());
-
-      // Load primary/default
-      await this.selectWallet('primary');
 
       this.walletLoaded = true;
     }
@@ -293,10 +310,10 @@ class App {
     const wallet = this.state.getWallet();
     if (!wallet)
       return;
-    const txs = await wallet.getHistory(this.state.selectedAccount);
-    txs.sort((a, b) => {
-      return b.mtime - a.mtime;
-    });
+    const txs = await wallet.getLast(
+      this.state.selectedAccount,
+      this.historyLimit
+    );
     const details = await wallet.toDetails(txs);
     const jsons = [];
     for (const item of details)
@@ -352,6 +369,15 @@ class App {
       // Note: `expired` will override the actual property from NameState,
       // but it's confusing and only has to do with claimable names...
       json.expired = ns.isExpired(height, network);
+
+      // Slow down the walletDB calls while syncing or rescanning
+      if (   this.node.chain.getProgress() < 0.9
+          || this.wdb.rescanning) {
+        if (this.wdb.height % 1000 !== 0) {
+          out.push(json);
+          continue;
+        }
+      }
 
       // TODO: check auction state before claiming ownership
       const {hash, index} = ns.owner;
