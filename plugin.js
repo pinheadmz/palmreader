@@ -32,7 +32,7 @@ const RPC = require('./lib/modals/rpc');
 class App {
   constructor(node) {
     this.refreshRate = 250;
-    this.historyLimit = 25;
+    this.historyLimit = 200;
 
     this.node = node;
     this.walletdb = null;
@@ -194,8 +194,8 @@ class App {
       }
 
       await this.loadWallet();
-      await this.getSelectedWalletHistory();
       await this.getSelectedWalletNames();
+      await this.getSelectedWalletHistory();
       await this.selectName(this.state.selectedName);
       this.refreshAll();
     });
@@ -306,8 +306,8 @@ class App {
       return;
     this.walletdb.rpc.wallet = wallet;
 
-    await this.getSelectedWalletHistory();
     await this.getSelectedWalletNames();
+    await this.getSelectedWalletHistory();
     await this.selectName(null);
   }
 
@@ -324,7 +324,7 @@ class App {
     for (const item of details)
       jsons.push(item.getJSON(this.wdb.network, this.wdb.height));
 
-    jsons.map((tx) => {
+    jsons.map(async (tx) => {
       tx.balanceDelta = 0;
       tx.actions = [];
       for (const input of tx.inputs) {
@@ -335,21 +335,43 @@ class App {
         if (output.path)
           tx.balanceDelta += output.value;
 
+        const nameHash = output.covenant.items[0];
+
         switch(output.covenant.type) {
           case Rules.types.NONE:
             break;
+          case Rules.types.CLAIM:
           case Rules.types.OPEN:
+          case Rules.types.BID:
+          case Rules.types.FINALIZE: {
+            const name =
+              Buffer.from(output.covenant.items[2], 'hex').toString('ascii');
+            this.state.namesByHash.set(nameHash, name);
             tx.actions.push(
-              'OPEN: ' +
-              Buffer.from(output.covenant.items[2], 'hex').toString('ascii')
+              Rules.typesByVal[output.covenant.type] + ': ' +
+              name
             );
             break;
-          default:
+          }
+          default: {
+            let name = this.state.namesByHash.get(nameHash);
+            // In some edge cases, the wallet won't actually know the name.
+            // Examples: renewing an ANYONE-CAN-RENEW
+            // Query the chain DB for this (full node only)
+            if (!name) {
+              const ns = await this.node.chain.db.getNameState(
+                Buffer.from(nameHash, 'hex')
+              );
+              if (ns) {
+                name = ns.name;
+                this.state.namesByHash.set(nameHash, name);
+              }
+            }
             tx.actions.push(
               Rules.typesByVal[output.covenant.type] +
-              ': ' +
-              this.state.namesByHash.get(output.covenant.items[0])
+              (name ? `: ${name}` : ': ?')
             );
+          }
         }
       }
     });
