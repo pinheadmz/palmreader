@@ -41,7 +41,12 @@ class App {
 
     this.state = new State();
 
-    this.screen = blessed.screen();
+    const screenOpts = {};
+    if (node.config.str('palmreaderlog')) {
+      screenOpts.log = node.config.str('palmreaderlog');
+    }
+
+    this.screen = blessed.screen(screenOpts);
 
     // Covers up a bug in blessed where fragments of "hidden" objects
     // still appear between the cracks of other visible objects.
