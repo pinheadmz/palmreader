@@ -19,6 +19,7 @@
   "dependencies": {
     "blessed": "github:pinheadmz/blessed",
     "blessed-contrib": "^4.11.0",
-    "blgr": "^0.2.0"
+    "blgr": "^0.2.0",
+    "hsd-ledger": "github:handshake-org/hsd-ledger"
   }
 }
