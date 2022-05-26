@@ -406,17 +406,19 @@ class App {
         }
       }
 
-      // TODO: check auction state before claiming ownership
       const {hash, index} = ns.owner;
       const coin = await wallet.getCoin(hash, index);
-      json.own = Boolean(coin);
+      json.own = Boolean(coin) && ns.isClosed(height, network);
 
       json.bids = await wallet.getBidsByName(ns.name);
       json.reveals = await wallet.getRevealsByName(ns.name);
 
+      let auction = false;
       for (const reveal of json.reveals) {
         if (!reveal.own)
           continue;
+
+        auction = true;
 
         // We can use the wallet's TX index to link our own bids
         // and reveals, but we can not link other users' bids and
@@ -430,6 +432,20 @@ class App {
         // Check if reveal is spent (needs redeem / register)
         const coin = await wallet.getCoin(hash, index);
         reveal.unspent = Boolean(coin);
+      }
+
+      // If we recieve a name as a TRANSFER/FINALIZE that means the wallet
+      // does not have any historical data for the name. Bids and reveals
+      // might not be so important after auction is over, but REGISTERs and
+      // UPDATEs might be. To ensure that we have the latest resource records
+      // for a received name, we can ask the full node.
+      if (json.own && !auction) {
+        // We can probably use pool in SPV mode to resolve these as well,
+        // but for big wallets that receive a ton of names it might be bad.
+        if (!this.node.chain.options.spv) {
+          const {data} = await this.node.chain.db.getNameState(ns.nameHash);
+          json.data = data.toString('hex');
+        }
       }
 
       out.push(json);
