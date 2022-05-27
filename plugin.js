@@ -28,6 +28,7 @@ const SignTransaction = require('./lib/modals/signTransaction');
 const ExportTransaction = require('./lib/modals/exportTransaction');
 const UpdateRecords = require('./lib/modals/updateRecords');
 const RPC = require('./lib/modals/rpc');
+const Help = require('./lib/modals/help');
 
 class App {
   constructor(node) {
@@ -161,13 +162,18 @@ class App {
       app: this,
       focusKeys: ['r', 'R']
     });
+    this.help = new Help({
+      app: this,
+      focusKeys: ['h', 'H']
+    });
 
     // Store all modals for refresh loops
     this.modals = [
       this.signTransaction,
       this.exportTransaction,
       this.updateRecords,
-      this.rpc
+      this.rpc,
+      this.help
     ];
   }
 
@@ -548,6 +554,13 @@ class App {
       return;
 
     this.updateRecords.open();
+  }
+
+  showHelp() {
+    if (!this.help)
+      return;
+
+    this.help.open();
   }
 }
 
