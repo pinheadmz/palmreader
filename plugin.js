@@ -10,6 +10,7 @@ const State = require('./lib/state');
 const {hsd} = require('./lib/util');
 const {Rules, Namestate} = hsd;
 
+const Meta = require('./lib/widgets/meta');
 const Logger = require('./lib/widgets/logger');
 const History = require('./lib/widgets/history');
 const NodeStatus = require('./lib/widgets/nodeStatus');
@@ -42,12 +43,14 @@ class App {
 
     this.state = new State();
 
-    const screenOpts = {};
+    const screenOpts = {fullUnicode: true};
     if (node.config.str('palmreaderlog')) {
       screenOpts.log = node.config.str('palmreaderlog');
     }
 
     this.screen = blessed.screen(screenOpts);
+
+    this.meta = new Meta({app: this});
 
     // Covers up a bug in blessed where fragments of "hidden" objects
     // still appear between the cracks of other visible objects.
@@ -55,7 +58,7 @@ class App {
     // and will be redrawn to cover up those fragments when screen is rendered.
     this.box = blessed.box({
       parent: this.screen,
-      top: 0,
+      top: 1,
       left: 0,
       right: 0,
       bottom: 0,
@@ -64,7 +67,7 @@ class App {
 
     // Main dashboard is a 12x12 grid.
     // TODO: this can be expanded to multiple "pages" using contrib.carousel
-    this.grid = new contrib.grid({rows: 12, cols: 12, screen: this.screen});
+    this.grid = new contrib.grid({rows: 12, cols: 12, screen: this.box});
 
     // Create and add widgets to grid
     // coords = [row, col, rowSpan, colSpan]
@@ -133,6 +136,7 @@ class App {
 
     // Store all widgets in array for refresh loops
     this.widgets = [
+      this.meta,
       this.logger,
       this.history,
       this.names,
@@ -513,10 +517,11 @@ class App {
   }
 
   log(msg) {
-    if (!this.logger)
-      return;
+    if (this.meta)
+      this.meta.log(msg);
 
-    this.logger.log(msg);
+    if (this.logger)
+      this.logger.log(msg);
   }
 
   async signTX(mtx) {
