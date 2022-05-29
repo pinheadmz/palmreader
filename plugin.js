@@ -5,10 +5,11 @@
 'use strict';
 
 const blessed = require('blessed');
-const contrib = require('blessed-contrib');
 const State = require('./lib/state');
 const {hsd} = require('./lib/util');
 const {Rules, Namestate} = hsd;
+
+const Page = require('./lib/page');
 
 const Meta = require('./lib/widgets/meta');
 const Logger = require('./lib/widgets/logger');
@@ -50,86 +51,96 @@ class App {
 
     this.screen = blessed.screen(screenOpts);
 
+    // Pages fill the screen with widgets
+    this.dashboard = new Page('Dashboard', this);
+    this.advanced =  new Page('Advanced', this);
+    this.pages = [
+      this.dashboard,
+      this.advanced
+    ];
+    this.currentPage = 0;
+    this.screen.append(this.pages[this.currentPage].box);
+
+    // Title bar is special widget that lives outside a page or grid
     this.meta = new Meta({app: this});
 
-    // Covers up a bug in blessed where fragments of "hidden" objects
-    // still appear between the cracks of other visible objects.
-    // This is just a big black curtain that hangs behind the grid
-    // and will be redrawn to cover up those fragments when screen is rendered.
-    this.box = blessed.box({
-      parent: this.screen,
-      top: 1,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      bg: 'black'
-    });
-
-    // Main dashboard is a 12x12 grid.
-    // TODO: this can be expanded to multiple "pages" using contrib.carousel
-    this.grid = new contrib.grid({rows: 12, cols: 12, screen: this.box});
-
-    // Create and add widgets to grid
+    // Create and add widgets to the 12x12 grid on a page
     // coords = [row, col, rowSpan, colSpan]
+    // PAGE 1 -- Wallet Dashboard
     this.logger = new Logger({
       app: this,
+      page: this.dashboard,
       coords: [0, 0, 3, 6]
     });
     this.history = new History({
       app: this,
-      coords: [3, 0, 3, 6]
+      page: this.dashboard,
+      coords: [3, 0, 4, 6]
     });
     this.names = new Names({
       app: this,
-      coords: [6, 0, 6, 3],
+      page: this.dashboard,
+      coords: [7, 0, 5, 3],
       focusKeys: ['n', 'N']
     });
     this.actions = new Actions({
       app: this,
-      coords: [6, 3, 6, 3],
+      page: this.dashboard,
+      coords: [7, 3, 5, 6],
       focusKeys: ['x', 'X']
     });
     this.nodeStatus = new NodeStatus({
       app: this,
+      page: this.dashboard,
       coords: [0, 6, 2, 6]
     });
     this.walletList = new WalletList({
       app: this,
+      page: this.dashboard,
       coords: [2, 6, 2, 3],
       focusKeys: ['w', 'W']
     });
     this.accountList = new AccountList({
       app: this,
-      coords: [2, 9, 2, 2],
+      page: this.dashboard,
+      coords: [2, 9, 2, 3],
       focusKeys: ['a', 'A']
-    });
-    this.createAccount = new CreateAccount({
-      app: this,
-      coords: [2, 11, 2, 1],
-      focusKeys: ['e', 'E']
     });
     this.accountDetails = new AccountDetails({
       app: this,
+      page: this.dashboard,
       coords: [4, 6, 3, 6],
       focusKeys: ['d', 'D']
     });
+    this.createTransaction = new CreateTransaction({
+      app: this,
+      page: this.dashboard,
+      coords: [7, 9, 5, 3],
+      focusKeys: ['t', 'T']
+    });
+
+    // PAGE 2 -- Advanced Options
+    this.createAccount = new CreateAccount({
+      app: this,
+      page: this.advanced,
+      coords: [2, 11, 2, 1],
+      focusKeys: ['e', 'E']
+    });
     this.createWallet = new CreateWallet({
       app: this,
+      page: this.advanced,
       coords: [7, 6, 2, 3],
       focusKeys: ['c', 'C']
     });
     this.backupWallet = new BackupWallet({
       app: this,
+      page: this.advanced,
       coords: [7, 9, 2, 3],
       focusKeys: ['b', 'B']
     });
-    this.createTransaction = new CreateTransaction({
-      app: this,
-      coords: [9, 6, 3, 3],
-      focusKeys: ['t', 'T']
-    });
     this.importTransaction = new ImportTransaction({
       app: this,
+      page: this.advanced,
       coords: [9, 9, 3, 3],
       focusKeys: ['i', 'I']
     });
@@ -220,6 +231,14 @@ class App {
     this.screen.key(['escape'], () => {
       this.modals.forEach(modal => modal.close());
       this.screen.focused = this.screen;
+    });
+    this.screen.key(['[', '{'], () => {
+      if (!this.isModalOpen())
+        this.prevPage();
+    });
+    this.screen.key([']','}'], () => {
+      if (!this.isModalOpen())
+        this.nextPage();
     });
 
     this.screen.render();
@@ -566,6 +585,19 @@ class App {
       return;
 
     this.help.open();
+  }
+
+  nextPage() {
+    this.pages[this.currentPage].box.detach();
+    this.currentPage = (this.currentPage + 1) % this.pages.length;
+    this.screen.append(this.pages[this.currentPage].box);
+  }
+
+  prevPage() {
+    this.pages[this.currentPage].box.detach();
+    this.currentPage = (this.currentPage + this.pages.length - 1)
+                       % this.pages.length;
+    this.screen.append(this.pages[this.currentPage].box);
   }
 }
 
