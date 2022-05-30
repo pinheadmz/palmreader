@@ -311,7 +311,7 @@ class App {
           await this.getSelectedWalletHistory();
           await this.refreshAll();
         } catch (e) {
-          this.log(e.message);
+          this.error(e.message);
         }
       });
 
@@ -541,6 +541,14 @@ class App {
 
     if (this.logger)
       this.logger.log(msg);
+  }
+
+  error(msg) {
+    if (this.meta)
+      this.meta.error(msg);
+
+    if (this.logger)
+      this.logger.error(msg);
   }
 
   async signTX(mtx) {
