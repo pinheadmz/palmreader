@@ -28,6 +28,7 @@ const Actions = require('./lib/widgets/actions');
 
 const SignTransaction = require('./lib/modals/signTransaction');
 const ExportTransaction = require('./lib/modals/exportTransaction');
+const InspectTransaction = require('./lib/modals/inspectTransaction');
 const UpdateRecords = require('./lib/modals/updateRecords');
 const RPC = require('./lib/modals/rpc');
 const Help = require('./lib/modals/help');
@@ -75,7 +76,8 @@ class App {
     this.history = new History({
       app: this,
       page: this.dashboard,
-      coords: [3, 0, 4, 6]
+      coords: [3, 0, 4, 6],
+      focusKeys: ['s', 'S']
     });
     this.names = new Names({
       app: this,
@@ -170,6 +172,9 @@ class App {
     this.exportTransaction = new ExportTransaction({
       app: this
     });
+    this.inspectTransaction = new InspectTransaction({
+      app: this
+    });
     this.updateRecords = new UpdateRecords({
       app: this
     });
@@ -186,6 +191,7 @@ class App {
     this.modals = [
       this.signTransaction,
       this.exportTransaction,
+      this.inspectTransaction,
       this.updateRecords,
       this.rpc,
       this.help
@@ -350,8 +356,12 @@ class App {
     );
     const details = await wallet.toDetails(txs);
     const jsons = [];
-    for (const item of details)
-      jsons.push(item.getJSON(this.wdb.network, this.wdb.height));
+    for (const item of details) {
+      const json = item.getJSON(this.wdb.network, this.wdb.height);
+      // reconnect original object for inspectTX()
+      json.tx = item.tx;
+      jsons.push(json);
+    }
 
     jsons.map(async (tx) => {
       tx.balanceDelta = 0;
@@ -392,7 +402,7 @@ class App {
                 Buffer.from(nameHash, 'hex')
               );
               if (ns) {
-                name = ns.name;
+                name = ns.name.toString('ascii');
                 this.state.namesByHash.set(nameHash, name);
               }
             }
@@ -571,6 +581,28 @@ class App {
 
     this.state.mtx = mtx;
     this.signTransaction.open();
+  }
+
+  async inspectTX(mtx) {
+    if (!this.inspectTransaction)
+      return;
+
+    const wallet = this.state.getWallet();
+    if (!wallet)
+      return;
+
+    // Get input coins to derive our known paths
+    const view = await wallet.getSpentView(mtx);
+    mtx.view = await wallet.getWalletCoinView(mtx, view);
+
+    // hsd wallet doesn't add path details to outputs... should it?
+    for (const output of mtx.outputs) {
+      const {address} = output;
+      output.path = await wallet.getPath(address);
+    }
+
+    this.state.mtx = mtx;
+    this.inspectTransaction.open();
   }
 
   exportTX(mtx) {
