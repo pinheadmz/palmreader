@@ -20,7 +20,7 @@ const AccountList = require('./lib/widgets/accountList');
 const AccountDetails = require('./lib/widgets/accountDetails');
 const CreateAccount = require('./lib/widgets/createAccount');
 const CreateWallet = require('./lib/widgets/createWallet');
-const BackupWallet = require('./lib/widgets/backupWallet');
+const Utilities = require('./lib/widgets/utilities');
 const CreateTransaction = require('./lib/widgets/createTransaction');
 const ImportTransaction = require('./lib/widgets/importTransaction');
 const Names = require('./lib/widgets/names');
@@ -42,6 +42,8 @@ class App {
     this.walletdb = null;
     this.wdb = null;
     this.walletLoaded = false;
+    this.widgets = [];
+    this.modals = [];
 
     this.state = new State();
 
@@ -51,6 +53,10 @@ class App {
     }
 
     this.screen = blessed.screen(screenOpts);
+
+    /*
+     * PAGES
+     */
 
     // Pages fill the screen with widgets
     this.dashboard = new Page('Dashboard', this);
@@ -64,6 +70,10 @@ class App {
 
     // Title bar is special widget that lives outside a page or grid
     this.meta = new Meta({app: this});
+
+    /*
+     * WIDGETS
+     */
 
     // Create and add widgets to the 12x12 grid on a page
     // coords = [row, col, rowSpan, colSpan]
@@ -125,45 +135,31 @@ class App {
     this.createAccount = new CreateAccount({
       app: this,
       page: this.advanced,
-      coords: [2, 11, 2, 1],
+      coords: [1, 3, 6, 3],
       focusKeys: ['e', 'E']
     });
     this.createWallet = new CreateWallet({
       app: this,
       page: this.advanced,
-      coords: [7, 6, 2, 3],
+      coords: [1, 0, 6, 3],
       focusKeys: ['c', 'C']
     });
-    this.backupWallet = new BackupWallet({
+    this.Utilities = new Utilities({
       app: this,
       page: this.advanced,
-      coords: [7, 9, 2, 3],
-      focusKeys: ['b', 'B']
+      coords: [1, 9, 6, 3],
+      focusKeys: ['u', 'U']
     });
     this.importTransaction = new ImportTransaction({
       app: this,
       page: this.advanced,
-      coords: [9, 9, 3, 3],
+      coords: [1, 6, 6, 3],
       focusKeys: ['i', 'I']
     });
 
-    // Store all widgets in array for refresh loops
-    this.widgets = [
-      this.meta,
-      this.logger,
-      this.history,
-      this.names,
-      this.actions,
-      this.nodeStatus,
-      this.walletList,
-      this.accountList,
-      this.createAccount,
-      this.accountDetails,
-      this.createWallet,
-      this.backupWallet,
-      this.createTransaction,
-      this.importTransaction
-    ];
+    /*
+     * MODALS
+     */
 
     // Create and add modals directly to sreen
     this.signTransaction = new SignTransaction({
@@ -186,16 +182,6 @@ class App {
       app: this,
       focusKeys: ['h', 'H']
     });
-
-    // Store all modals for refresh loops
-    this.modals = [
-      this.signTransaction,
-      this.exportTransaction,
-      this.inspectTransaction,
-      this.updateRecords,
-      this.rpc,
-      this.help
-    ];
   }
 
   async open() {
@@ -252,7 +238,6 @@ class App {
 
   refreshAll() {
     this.widgets.forEach(widget => widget.refresh());
-    // TODO: do modals need to be refreshed 4x a second?!
     this.screen.render();
   }
 
