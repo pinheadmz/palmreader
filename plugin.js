@@ -135,25 +135,25 @@ class App {
     this.createAccount = new CreateAccount({
       app: this,
       page: this.advanced,
-      coords: [1, 3, 6, 3],
+      coords: [1, 3, 9, 3],
       focusKeys: ['e', 'E']
     });
     this.createWallet = new CreateWallet({
       app: this,
       page: this.advanced,
-      coords: [1, 0, 6, 3],
+      coords: [1, 0, 9, 3],
       focusKeys: ['c', 'C']
     });
     this.Utilities = new Utilities({
       app: this,
       page: this.advanced,
-      coords: [1, 9, 6, 3],
+      coords: [1, 9, 9, 3],
       focusKeys: ['u', 'U']
     });
     this.importTransaction = new ImportTransaction({
       app: this,
       page: this.advanced,
-      coords: [1, 6, 6, 3],
+      coords: [1, 6, 9, 3],
       focusKeys: ['i', 'I']
     });
 
