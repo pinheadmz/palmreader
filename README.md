@@ -13,3 +13,14 @@ cd /path/to/hsd
 npm install pinheadmz/palmreader
 hsd --network=regtest --plugins=palmreader
 ```
+
+## Dependencies
+
+Due to the sensitivity of cryptocurrency software to dependency risk, only
+software written by The Handshake Developers is required by Palm Reader.
+
+Any exceptions to this will be vendored and indicated below:
+
+https://github.com/yaronn/blessed-contrib has been stripped down and included
+in `src/` along with snippets from https://github.com/chalk/strip-ansi and
+https://github.com/chalk/ansi-regex (all MIT License)
