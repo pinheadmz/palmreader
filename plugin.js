@@ -42,6 +42,7 @@ class App {
     this.walletdb = null;
     this.wdb = null;
     this.walletLoaded = false;
+    this.pages = [];
     this.widgets = [];
     this.modals = [];
 
@@ -61,10 +62,8 @@ class App {
     // Pages fill the screen with widgets
     this.dashboard = new Page('Dashboard', this);
     this.advanced =  new Page('Advanced', this);
-    this.pages = [
-      this.dashboard,
-      this.advanced
-    ];
+
+    // "Carousel"
     this.currentPage = 0;
     this.screen.append(this.pages[this.currentPage].box);
 
