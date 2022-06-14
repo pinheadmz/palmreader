@@ -4,6 +4,9 @@
 
 'use strict';
 
+const Path = require('path');
+const fs = require('fs');
+
 const blessed = require('blessed');
 const State = require('./lib/state');
 const {hsd} = require('./lib/util');
@@ -609,6 +612,20 @@ class App {
       return;
 
     this.help.open();
+  }
+
+  exportFile(content, path) {
+    try {
+      // Remember location in state
+      const words = path.split(Path.sep);
+      const filename = words.pop();
+      this.state.exportDir = Path.join(Path.sep, ...words);
+      fs.mkdirSync(this.state.exportDir, {recursive: true});
+      fs.writeFileSync(path, content);
+      this.log(`Wrote file: ${filename}`);
+    } catch (e) {
+      this.error(`Error writing file: ${e.message}`);
+    }
   }
 
   nextPage() {
