@@ -8,6 +8,14 @@
 
 ## Installation and usage
 
+For "copy" functionality you must have `pbcopy`, `xsel` or `xclip` installed on
+your system. Widgets with copy functions also have the option to export text
+to a file as an alternative.
+
+**OSX:** `brew install pbcopy`
+
+**Linux:** `apt install xsel`
+
 ```
 cd /path/to/hsd
 npm install pinheadmz/palmreader
