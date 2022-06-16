@@ -628,6 +628,15 @@ class App {
     }
   }
 
+  gotoPage(index) {
+    if (index > this.pages.length - 1)
+      return;
+
+    this.pages[this.currentPage].box.detach();
+    this.currentPage = index;
+    this.screen.append(this.pages[this.currentPage].box);
+  }
+
   nextPage() {
     this.pages[this.currentPage].box.detach();
     this.currentPage = (this.currentPage + 1) % this.pages.length;
