@@ -2,8 +2,19 @@
   "name": "palmreader",
   "version": "0.0.0",
   "description": "",
-  "main": "plugin.js",
+  "main": "./plugin.js",
+  "bin": {
+    "palmreader": "./bin/palmreader"
+  },
+  "pkg": {
+    "assets": [
+      "node_modules/**/build/Release/*.node",
+      "node_modules/hsd-ledger/lib/**"
+    ],
+    "outputPath": "build"
+  },
   "scripts": {
+    "build": "pkg -d -t host .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,5 +31,9 @@
     "blessed": "github:pinheadmz/blessed",
     "blgr": "^0.2.0",
     "hsd-ledger": "^2.0.1"
+  },
+  "devDependencies": {
+    "hsd": "^4.0.1",
+    "loady": "github:pinheadmz/loady#pkg2"
   }
 }

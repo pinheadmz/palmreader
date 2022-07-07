@@ -2,11 +2,11 @@
 
 ## Terminal UI plugin for hsd
 
-### Status: ALPHA -- use at your own risk
-
 ![palmreader-screenshot](https://raw.githubusercontent.com/pinheadmz/palmreader/master/docs/screenshot1.png)
 
 ## Installation and usage
+
+### Copy to clipboard
 
 For "copy" functionality you must have `pbcopy`, `xsel` or `xclip` installed on
 your system. Widgets with copy functions also have the option to export text
@@ -16,10 +16,14 @@ to a file as an alternative.
 
 **Linux:** `apt install xsel`
 
+### Ledger
+
+**Linux:** `apt install libusb-1.0-0-dev libudev-dev`
+
+[Also be sure to set up udev rules for Ledger:](https://support.ledger.com/hc/en-us/articles/115005165269-Fix-USB-connection-issues-with-Ledger-Live?support=true)
+
 ```
-cd /path/to/hsd
-npm install pinheadmz/palmreader
-hsd --network=regtest --plugins=palmreader
+wget -q -O - https://raw.githubusercontent.com/LedgerHQ/udev-rules/master/add_udev_rules.sh | sudo bash
 ```
 
 ## Dependencies
