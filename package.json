@@ -9,7 +9,8 @@
   "pkg": {
     "assets": [
       "node_modules/**/build/Release/*.node",
-      "node_modules/hsd-ledger/lib/**"
+      "node_modules/hsd-ledger/lib/**",
+      "node_modules/hsd/lib/**"
     ],
     "outputPath": "build"
   },
@@ -34,6 +35,7 @@
   },
   "devDependencies": {
     "hsd": "^4.0.1",
-    "loady": "github:pinheadmz/loady#pkg2"
+    "loady": "github:pinheadmz/loady#pkg2",
+    "pkg": "^5.7.0"
   }
 }

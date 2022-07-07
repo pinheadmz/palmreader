@@ -54,8 +54,10 @@ npm i -g
 cd ..
 git clone https://github.com/pinheadmz/palmreader
 cd palmreader
-npm i -g
+npm i -g --prod
 ```
+
+**The `--prod` flag is important here!**
 
 ## Usage
 
@@ -74,6 +76,21 @@ hsd --plugins palmreader --spv --no-dns --api-key sandwich
 hsd --plugins palmreader --network regtest --prefix ~/.config/Bob/hsd_data
 hsd --plugins palmreader --log-level spam
 ```
+
+## Build executable
+
+We use [pkg](https://github.com/vercel/pkg) to create an executable that bundles
+nodejs itself along with hsd and Palm Reader scripts.
+
+This time, remove the `--prod` flag after cloning from git:
+
+```
+cd palmreader
+npm i
+npm run build
+```
+
+Executable will be compiled to the `build/` directory.
 
 ## Dependencies
 
