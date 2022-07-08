@@ -10,7 +10,8 @@
     "assets": [
       "node_modules/**/build/Release/*.node",
       "node_modules/hsd-ledger/lib/**",
-      "node_modules/hsd/lib/**"
+      "node_modules/hsd/lib/**",
+      "node_modules/blessed/usr/**"
     ],
     "outputPath": "build"
   },
