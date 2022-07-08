@@ -10,7 +10,7 @@ jobs:
         os: [macos-latest, windows-latest, ubuntu-latest]
 
         include:
-          - os: ubuntu-18.04
+          - os: ubuntu-latest
             out_filename: palmreader-linux
           - os: windows-latest
             out_filename: palmreader-windows
