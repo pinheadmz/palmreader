@@ -3,11 +3,19 @@ name: Build
 on: workflow_dispatch
 
 jobs:
-  package:
+  build:
     strategy:
       fail-fast: false
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
+
+        include:
+          - os: ubuntu-18.04
+            out_filename: palmreader-linux
+          - os: windows-latest
+            out_filename: palmreader-windows
+          - os: macos-latest
+            out_filename: palmreader-macos
 
     runs-on: ${{matrix.os}}
 
@@ -33,5 +41,5 @@ jobs:
       - name: Store artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: palmreader-${{ matrix.os }}
-          path: build/palmreader
+          name: ${{ matrix.out_filename }}
+          path: build/palmreader*
