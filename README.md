@@ -73,7 +73,7 @@ Examples:
 
 ```
 hsd --plugins palmreader --spv --no-dns --api-key sandwich
-hsd --plugins palmreader --network regtest --prefix ~/.config/Bob/hsd_data
+hsd --plugins palmreader --network regtest --index-tx --index-address --prefix ~/.config/Bob/hsd_data
 hsd --plugins palmreader --log-level spam
 ```
 
