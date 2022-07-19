@@ -50,11 +50,13 @@ Clone and install as global node modules:
 ```
 git clone https://github.com/handshake-org/hsd
 cd hsd
+npm i
 npm i -g
 cd ..
 git clone https://github.com/pinheadmz/palmreader
 cd palmreader
-npm i -g --prod
+npm i --prod
+npm i -g
 ```
 
 **The `--prod` flag is important here!**
