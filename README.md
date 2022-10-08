@@ -23,6 +23,26 @@ to a file as an alternative.
 
 **Linux:** `apt install xsel`
 
+### Copy and Paste over SSH
+
+For server: 
+
+- Make sure that `X11Forwarding yes` must specified in `/etc/ssh/sshd_config` (default on Debian\Ubuntu).
+
+- Must have `xsel` or `xclip` installed on your system.
+
+- X11 on Debian/Ubuntu: `$ sudo apt install xauth xfonts-base`
+
+For client: 
+
+- Must support X11 forwarding, for example Putty or MobaXterm.
+
+Usage:
+
+ `copy`: click on the content.
+
+ `paste`: press `SHIFT or CTRL + Right Click` on SSH window.
+
 ### Ledger
 
 Ledger requires additional drivers and permissions on Linux.
@@ -47,6 +67,7 @@ do **not** just use `sudo`, [fix the problem instead.](https://docs.npmjs.com/re
 ### Install locally using git (for contributing developers)
 
 Clone and install as global node modules:
+
 ```
 git clone https://github.com/handshake-org/hsd
 cd hsd
