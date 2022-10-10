@@ -34,12 +34,13 @@ function Table(options) {
   options.fg = options.fg || 'green';
   options.bg = options.bg || '';
   options.interactive = (typeof options.interactive === 'undefined') ? true : options.interactive;
+  options.headers = options.headers===false ? false : true;
   this.options = options;
   Box.call(this, options);
 
   this.rows = blessed.list({
     //height: 0,
-    top: 2,
+    top: options.headers ? 2 : 0,
     width: 0,
     left: 1,
     style: { selected: {
@@ -75,12 +76,19 @@ Table.prototype.focus = function(){
 };
 
 Table.prototype.render = function() {
-  if(this.screen.focused == this.rows)
-    this.rows.focus();
 
   this.rows.width = this.width-3;
-  this.rows.height = this.height-4;
+  this.rows.height = this.height-2;
+
+  if (this.style.border && this.options.headers)
+    this.rows.height -= 2;
+
+  // if (this.options.headers)
+  //   this.rows.height -= 2;
+
   Box.prototype.render.call(this);
+  if(this.screen.focused == this.rows)
+    this.rows.focus();
 };
 
 
@@ -110,7 +118,7 @@ Table.prototype.setData = function(table) {
     var str = dataToString(d);
     formatted.push(str);
   });
-  this.setContent(dataToString(table.headers));
+  if (this.options.headers) { this.setContent(dataToString(table.headers)) };
   this.rows.setItems(formatted);
 };
 
