@@ -32,10 +32,10 @@
   "dependencies": {
     "blessed": "github:pinheadmz/blessed",
     "blgr": "^0.2.0",
-    "hsd-ledger": "^2.0.1"
+    "hsd-ledger": "^2.0.1",
+    "hsd": "^4.0.1"
   },
   "devDependencies": {
-    "hsd": "^4.0.1",
     "loady": "github:pinheadmz/loady#pkg2",
     "pkg": "^5.7.0"
   }
