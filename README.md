@@ -37,38 +37,55 @@ wget -q -O - https://raw.githubusercontent.com/LedgerHQ/udev-rules/master/add_ud
 
 ## Installation
 
-### Install globally using npm
-
-*If you get permissions errors installing global nodejs packages,
-do **not** just use `sudo`, [fix the problem instead.](https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally)*
-
-`npm install -g hsd palmreader`
-
-### Install locally using git (for contributing developers)
-
-Clone and install as global node modules:
+Clone and install:
 ```
-git clone https://github.com/handshake-org/hsd
-cd hsd
-npm i
-npm i -g
-cd ..
 git clone https://github.com/pinheadmz/palmreader
 cd palmreader
 npm i --prod
-npm i -g
 ```
 
 **The `--prod` flag is important here!**
 
 ## Usage
 
-With hsd and Palm Reader both installed as global nodejs packages, run:
+**See the [wiki](https://github.com/pinheadmz/palmreader/wiki/Introduction)
+for more information**
 
-`hsd --plugins palmreader`
+### Self-contained app (easiest)
 
-Notice that hsd is still the main process and Palm Reader is added as a plug-in.
-This means your hsd node remains [fully configurable](https://hsd-dev.org/guides/config.html),
+`./bin/palmreader`
+
+This will launch the Setup Wizard, a terminal UI with the most common hsd
+options. Hit `enter` to launch the node and wallet with selected options.
+
+To bypass the setup wizard, single-letter options can be passed in. For example,
+to start Palm Reader in regtest mode with a full node, saving data to the default
+hsd location:
+
+```
+./bin/palmreader -rfd
+```
+
+...or to a custom location:
+
+```
+./bin/palmreader -o ~/Desktop/test
+```
+
+...or with additional parameters for hsd:
+
+```
+./bin/palmreader -o ~/Desktop/test --index-tx
+```
+
+
+### As hsd plug-in (advanced)
+
+`/pah/to/hsd --plugins /path/to/palmreader`
+
+Notice that in this configuration hsd is still the main process and Palm Reader
+is added as a plug-in. This means your hsd node remains
+[fully configurable](https://hsd-dev.org/guides/config.html),
 and ALL configurations "should be" compatible with Palm Reader.
 
 Examples:
