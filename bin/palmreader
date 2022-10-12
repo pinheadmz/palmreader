@@ -1,200 +1,58 @@
 #!/usr/bin/env node
+/* eslint no-nested-ternary: "off" */
 
 'use strict';
 
 Buffer.poolSize = 0;
 process.title = 'palmreader';
 
-const os = require('os');
-const path = require('path');
-const blessed = require('blessed');
-const {addInputH, addButton} = require('../lib/util');
+const SetupWizard = require('../lib/wizards/setup');
+const {
+  getDefault,
+  getBob
+} = SetupWizard;
 
-const screen = blessed.screen();
+const [,, opts,  path] = process.argv;
 
-// MAIN
-const form = blessed.form({
-  parent: screen,
-  interactive: true,
-  keys: true,
-  mouse: true,
-  border: {
-    type: 'line',
-    fg: 'red'
+(async () => {
+  if (opts) {
+    const flags = opts.split('');
+    if (flags.shift() !== '-')
+      usage();
+
+    // Pass all double dash --options directly to hsd
+    if (flags[0] === '-') {
+      return start({});
+    }
+
+    return start({
+      network: flags.includes('r') ? 'regtest' : 'main',
+      prefix: flags.includes('o') ? path
+              : flags.includes('b') ? getBob() : getDefault(),
+      mode: flags.includes('s') ? false : true,
+      indexTX: flags.includes('b') ? true : undefined,
+      indexAddress: flags.includes('b') ? true : undefined
+    });
+  } else {
+    const setupWizard = new SetupWizard();
+    setupWizard.open();
+    const options = await setupWizard.waitForOptions();
+    setupWizard.close();
+    return start(options);
   }
-});
+})();
 
-blessed.text({
-    parent: form,
-    content:
-      'Palm Reader Setup Wizard\n' +
-      ' press ctrl-C to (Q)uit',
-    top: 0,
-    left: 'center',
-    width: 40,
-    bold: true
-  });
-
-// OPTIONS
-// Network
-const network = blessed.radioset({
-  parent: form,
-  left: 2,
-  top: 2,
-  shrink: true,
-  content: 'Network:',
-  style: {bold: true}
-});
-  const mainNet = blessed.radiobutton({
-    parent: network,
-    mouse: true,
-    keys: true,
-    shrink: true,
-    height: 1,
-    left: 0,
-    top: 2,
-    name: 'main',
-    content: '(M)ain',
-    checked: true
-  });
-  const regNet = blessed.radiobutton({
-    parent: network,
-    mouse: true,
-    keys: true,
-    shrink: true,
-    height: 1,
-    left: 0,
-    top: 3,
-    name: 'regtest',
-    content: '(R)egtest'
-  });
-
-// Prefix
-const home = path.join(os.homedir(), '.hsd');
-let bob =  os.homedir();
-switch (os.type()) {
-  case 'Darwin':
-    bob = path.join(bob, 'Library', 'Application Support', 'Bob', 'hsd_data');
-    break;
-  case 'Linux':
-    bob = path.join(bob, '.config', 'Bob', 'hsd_data');
-    break;
-  case 'Windows_NT':
-    bob = path.join(bob, 'Bob', 'hsd_data');
-    break;
-  default:
-    throw new Error('Unrecognized OS');
-}
-const prefix = blessed.radioset({
-  parent: form,
-  left: 2,
-  top: 8,
-  shrink: true,
-  content: 'Data Directory:',
-  style: {bold: true}
-});
-  const homeDir = blessed.radiobutton({
-    parent: prefix,
-    mouse: true,
-    keys: true,
-    shrink: true,
-    height: 1,
-    left: 0,
-    top: 2,
-    name: 'homeDir',
-    content: '(D)efault: ' + home,
-    checked: true
-  });
-  const bobDir = blessed.radiobutton({
-    parent: prefix,
-    mouse: true,
-    keys: true,
-    shrink: true,
-    height: 1,
-    left: 0,
-    top: 3,
-    name: 'bobDir',
-    content: '(B)ob:     ' + bob
-  });
-
-// START BUTTONS
-addButton(
-  form,
-  'START (F)ULL NODE',
-  {
-    bottom: 10,
-    right: 10
-  }
-).on('press', async () => {
-  return start(true);
-});
-
-addButton(
-  form,
-  'START (S)PV NODE',
-  {
-    bottom: 10,
-    left: 10
-  }
-).on('press', async () => {
-  return start(false);
-});
-
-screen.render();
-
-// KEYS
-screen.key(['Q', 'q', 'C-c'], async () => {
-  return process.exit(0);
-});
-screen.key(['F', 'f'], async () => {
-  return start(true);
-});
-screen.key(['S', 's'], async () => {
-  return start(false);
-});
-screen.key(['R', 'r'], async () => {
-  regNet.check();
-  screen.render();
-});
-screen.key(['M', 'm'], async () => {
-  mainNet.check();
-  screen.render();
-});
-screen.key(['D', 'd'], async () => {
-  homeDir.check();
-  screen.render();
-});
-screen.key(['B', 'b'], async () => {
-  bobDir.check();
-  screen.render();
-});
-
-// HSD
-async function start(full) {
-  screen.destroy();
-  console.log('👋 Palm Reader...');
-  const {FullNode, SPVNode} = require('hsd');
-  const Node = full ? FullNode : SPVNode;
-
+async function start(options) {
   const {
-    main,
-    regtest,
-    homeDir,
-    bobDir
-  } = form.submit();
+    network,
+    prefix,
+    mode,
+    indexTX,
+    indexAddress
+  } = options;
 
-  let network, prefix, indexTX, indexAddress;
-  if (main)
-    network = 'main';
-  if (regtest)
-    network = 'regtest';
-  if (homeDir)
-    prefix = home;
-  if (bobDir) {
-    prefix = bob;
-    indexTX = true;
-    indexAddress = true;
-  }
+  const {FullNode, SPVNode} = require('hsd');
+  const Node = mode ? FullNode : SPVNode;
 
   const node = new Node({
     config: true,
@@ -243,4 +101,20 @@ async function start(full) {
   await node.open();
   await node.connect();
   node.startSync();
-};
+}
+
+function usage() {
+  console.log(`
+Usage:
+
+  Launch setup wizard: $ palmreader
+
+  Launch with specific options: $ palmreader -opts [path]
+
+opts:
+ m/r    Main / Regtest
+ d/b/o  Default hsd path / Bob Wallet path / Other [path]
+ s/f    SPV / Full node
+`);
+  process.exit(0);
+}
