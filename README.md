@@ -8,6 +8,11 @@
 
 > Coming soon!
 
+## Usage
+
+**See the [wiki](https://github.com/pinheadmz/palmreader/wiki/1.-Introduction)
+for more information**
+
 ## Prerequisites
 
 Palm Reader (and hsd) require nodejs v16 or greater.
@@ -35,7 +40,27 @@ Ledger requires additional drivers and permissions on Linux.
 wget -q -O - https://raw.githubusercontent.com/LedgerHQ/udev-rules/master/add_udev_rules.sh | sudo bash
 ```
 
-## Installation
+## Install and run (easiest)
+
+This command will download and install Palm Reader (bundled with hsd) and run
+the [`Setup Wizard`](https://github.com/pinheadmz/palmreader/wiki/2.-Setup-Wizard-and-configuration)
+right away. The code only needs to be downloaded once, after
+that the same command will run the application.
+
+```
+npm exec palmreader
+```
+
+Options can be passed
+[using this syntax](https://github.com/pinheadmz/palmreader/wiki/2.-Setup-Wizard-and-configuration#bypass-wizard-with-command-line-flags)
+to bypass the setup wizard:
+
+```
+# Skip setup wizard, run hsd full node with default configuration
+npm exec palmreader -- -f
+```
+
+## Developer installation
 
 Clone and install:
 ```
@@ -46,21 +71,19 @@ npm i --prod
 
 **The `--prod` flag is important here!**
 
-## Usage
-
-**See the [wiki](https://github.com/pinheadmz/palmreader/wiki/Introduction)
-for more information**
-
 ### Self-contained app (easiest)
 
 `./bin/palmreader`
 
-This will launch the Setup Wizard, a terminal UI with the most common hsd
+This will launch the
+[`Setup Wizard`](https://github.com/pinheadmz/palmreader/wiki/2.-Setup-Wizard-and-configuration),
+a terminal UI with the most common hsd
 options. Hit `enter` to launch the node and wallet with selected options.
 
-To bypass the setup wizard, single-letter options can be passed in. For example,
-to start Palm Reader in regtest mode with a full node, saving data to the default
-hsd location:
+Options can be passed
+[using this syntax](https://github.com/pinheadmz/palmreader/wiki/2.-Setup-Wizard-and-configuration#bypass-wizard-with-command-line-flags)
+to bypass the setup wizard. For example, to start Palm Reader in regtest mode
+with a full node, saving data to the default hsd location:
 
 ```
 ./bin/palmreader -rfd
@@ -81,7 +104,7 @@ hsd location:
 
 ### As hsd plug-in (advanced)
 
-`/pah/to/hsd --plugins /path/to/palmreader`
+`/path/to/hsd --plugins /path/to/palmreader`
 
 Notice that in this configuration hsd is still the main process and Palm Reader
 is added as a plug-in. This means your hsd node remains
