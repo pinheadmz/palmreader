@@ -62,13 +62,18 @@ class App {
      * PAGES
      */
 
+    this.wide = true;
+    if (this.screen.cols < 100)
+      this.wide = false;
+
     // Pages fill the screen with widgets
-    this.dashboard = new Page('Dashboard', this);
-    this.advanced =  new Page('Advanced', this);
+    if (this.wide) {
+      new Page('Dashboard', this);
+      new Page('Advanced', this);
+    }
 
     // "Carousel"
     this.currentPage = 0;
-    this.screen.append(this.pages[this.currentPage].box);
 
     // Title bar is special widget that lives outside a page or grid
     this.meta = new Meta({app: this});
@@ -79,83 +84,83 @@ class App {
 
     // Create and add widgets to the 12x12 grid on a page
     // coords = [row, col, rowSpan, colSpan]
-    // PAGE 1 -- Wallet Dashboard
+    // PAGE 0 -- Wallet Dashboard
     this.logger = new Logger({
       app: this,
-      page: this.dashboard,
-      coords: [0, 0, 3, 6]
+      page: this.wide ? this.pages[0] : new Page('Palm Reader', this),
+      coords: this.wide ? [0, 0, 3, 6] : [0, 0, 12, 12]
     });
     this.history = new History({
       app: this,
-      page: this.dashboard,
-      coords: [3, 0, 4, 6],
+      page: this.wide ? this.pages[0] : new Page('Palm Reader', this),
+      coords: this.wide ? [3, 0, 4, 6] : [0, 0, 12, 12],
       focusKeys: ['s', 'S']
     });
     this.names = new Names({
       app: this,
-      page: this.dashboard,
-      coords: [7, 0, 5, 3],
+      page: this.wide ? this.pages[0] : new Page('Palm Reader', this),
+      coords: this.wide ? [7, 0, 5, 3] : [0, 0, 12, 12],
       focusKeys: ['n', 'N']
     });
     this.actions = new Actions({
       app: this,
-      page: this.dashboard,
-      coords: [7, 3, 5, 6],
+      page: this.wide ? this.pages[0] : new Page('Palm Reader', this),
+      coords: this.wide ? [7, 3, 5, 6] : [0, 0, 12, 12],
       focusKeys: ['x', 'X']
     });
     this.nodeStatus = new NodeStatus({
       app: this,
-      page: this.dashboard,
-      coords: [0, 6, 2, 6]
+      page: this.wide ? this.pages[0] : new Page('Palm Reader', this),
+      coords: this.wide ? [0, 6, 2, 6] : [0, 0, 12, 12]
     });
     this.walletList = new WalletList({
       app: this,
-      page: this.dashboard,
-      coords: [2, 6, 2, 3],
+      page: this.wide ? this.pages[0] : new Page('Palm Reader', this),
+      coords: this.wide ? [2, 6, 2, 3] : [0, 0, 12, 12],
       focusKeys: ['w', 'W']
     });
     this.accountList = new AccountList({
       app: this,
-      page: this.dashboard,
-      coords: [2, 9, 2, 3],
+      page: this.wide ? this.pages[0] : new Page('Palm Reader', this),
+      coords: this.wide ? [2, 9, 2, 3] : [0, 0, 12, 12],
       focusKeys: ['a', 'A']
     });
     this.accountDetails = new AccountDetails({
       app: this,
-      page: this.dashboard,
-      coords: [4, 6, 3, 6],
+      page: this.wide ? this.pages[0] : new Page('Palm Reader', this),
+      coords: this.wide ? [4, 6, 3, 6] : [0, 0, 12, 12],
       focusKeys: ['d', 'D']
     });
     this.createTransaction = new CreateTransaction({
       app: this,
-      page: this.dashboard,
-      coords: [7, 9, 5, 3],
+      page: this.wide ? this.pages[0] : new Page('Palm Reader', this),
+      coords: this.wide ? [7, 9, 5, 3] : [0, 0, 12, 12],
       focusKeys: ['t', 'T']
     });
 
-    // PAGE 2 -- Advanced Options
+    // PAGE 1 -- Advanced Options
     this.createAccount = new CreateAccount({
       app: this,
-      page: this.advanced,
-      coords: [1, 3, 9, 3],
+      page: this.wide ? this.pages[1] : new Page('Palm Reader', this),
+      coords: this.wide ? [1, 3, 9, 3] : [0, 0, 12, 12],
       focusKeys: ['e', 'E']
     });
     this.createWallet = new CreateWallet({
       app: this,
-      page: this.advanced,
-      coords: [1, 0, 9, 3],
+      page: this.wide ? this.pages[1] : new Page('Palm Reader', this),
+      coords: this.wide ? [1, 0, 9, 3] : [0, 0, 12, 12],
       focusKeys: ['c', 'C']
     });
     this.Utilities = new Utilities({
       app: this,
-      page: this.advanced,
-      coords: [1, 9, 9, 3],
+      page: this.wide ? this.pages[1] : new Page('Palm Reader', this),
+      coords: this.wide ? [1, 9, 9, 3] : [0, 0, 12, 12],
       focusKeys: ['u', 'U']
     });
     this.importTransaction = new ImportTransaction({
       app: this,
-      page: this.advanced,
-      coords: [1, 6, 9, 3],
+      page: this.wide ? this.pages[1] : new Page('Palm Reader', this),
+      coords: this.wide ? [1, 6, 9, 3] : [0, 0, 12, 12],
       focusKeys: ['i', 'I']
     });
 
@@ -184,6 +189,8 @@ class App {
       app: this,
       focusKeys: ['h', 'H']
     });
+
+    this.screen.append(this.pages[this.currentPage].box);
   }
 
   async open() {
