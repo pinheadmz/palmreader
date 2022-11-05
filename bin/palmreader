@@ -7,6 +7,7 @@
 Buffer.poolSize = 0;
 process.title = 'palmreader';
 
+const {version} = require('../package.json');
 const SetupWizard = require('../lib/wizards/setup');
 const {
   getDefault,
@@ -69,7 +70,8 @@ async function start(options) {
     prefix,
     network,
     indexTX,
-    indexAddress
+    indexAddress,
+    agent: `PalmReader:${version}`
   });
 
   const wallet = require('hsd/lib/wallet/plugin');
