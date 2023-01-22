@@ -71,7 +71,9 @@ async function start(options) {
     network,
     indexTX,
     indexAddress,
-    agent: `PalmReader:${version}`
+    agent: `PalmReader:${version}`,
+    walletMigrate: 2,
+    chainMigrate: 3
   });
 
   const wallet = require('hsd/lib/wallet/plugin');

@@ -1,6 +1,6 @@
 {
   "name": "palmreader",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "",
   "main": "./plugin.js",
   "bin": {
@@ -33,7 +33,7 @@
     "blessed": "github:pinheadmz/blessed",
     "blgr": "^0.2.0",
     "hsd-ledger": "^2.0.1",
-    "hsd": "^4.0.1"
+    "hsd": "^5.0.1"
   },
   "devDependencies": {
     "loady": "github:pinheadmz/loady#pkg2",
