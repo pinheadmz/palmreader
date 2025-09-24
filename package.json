@@ -33,7 +33,7 @@
     "blessed": "github:pinheadmz/blessed",
     "blgr": "^0.2.0",
     "hsd-ledger": "^2.0.1",
-    "hsd": "^5.0.1"
+    "hsd": "^8.0.0"
   },
   "devDependencies": {
     "loady": "github:pinheadmz/loady#pkg2",

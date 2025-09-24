@@ -39,7 +39,7 @@ const Help = require('./lib/modals/help');
 class App {
   constructor(node) {
     this.refreshRate = 250;
-    this.historyLimit = 200;
+    this.historyLimit = 100;
 
     this.node = node;
     this.walletdb = null;
@@ -344,9 +344,12 @@ class App {
     const wallet = this.state.getWallet();
     if (!wallet)
       return;
-    const txs = await wallet.getLast(
+    const txs = await wallet.listHistory(
       this.state.selectedAccount,
-      this.historyLimit
+      {
+        limit: this.historyLimit,
+        reverse: true
+      }
     );
     const details = await wallet.toDetails(txs);
     const jsons = [];
